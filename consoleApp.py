@@ -211,6 +211,9 @@ class Main:
 
         if account is None:
             return
+        if account.balance < 0:
+            print("Cannot withdraw from an overdrawn account.")
+            return
 
         amount = self.get_amount("Enter withdrawal amount: $")
 
