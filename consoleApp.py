@@ -2,179 +2,355 @@
 # console app for a simple bank function
 
 import random
-
+import pdb
 
 class Main:
     def __init__(self):
         self.customers = []
-        self.transactions = []
 
     @staticmethod
     def welcome_message():
-        print("Welcome to The Bank.")
+        print("\nWelcome to The Bank.")
         print("1. Create an Account")
-        print("2. View Account Details")
-        print("3. Deposit Money")
-        print("4. Withdraw Money")
-        print("5. View Transaction History")
-        print("6. Exit")
+        print("2. Access an Account")
+        print("3. Exit")
 
     def main(self):
         while True:
             self.welcome_message()
-            choice = input("Select an option (1-6): ").strip()
+            choice = input("Select an option (1-3): ").strip()
 
             match choice:
                 case "1":
                     self.create_account()
                 case "2":
-                    self.view_account_details()
+                    self.access_account()
                 case "3":
-                    self.deposit_money()
-                case "4":
-                    self.withdraw_money()
-                case "5":
-                    self.view_transaction_history()
-                case "6":
                     print("\nThank you for banking with us. Goodbye.")
                     break
                 case _:
-                    print("\nInvalid choice. Please type a number between 1 and 6.")
+                    print("\nInvalid choice. Please type a number between 1 and 3.")
+
+    def username_exists(self, username):
+        return any(customer.username.lower() == username.lower() for customer in self.customers)
+
+    def _get_customer(self, username):
+        for customer in self.customers:
+            if customer.username.lower() == username.lower():
+                return customer
+        return None
 
     def create_account(self):
+        print("\n--- Create Account ---")
+
         name = input("Enter full name: ").strip()
-        usnm = input("Enter username: ").strip()
-        pswd = input("Enter password: ").strip()
+        if not name:
+            print("\nName cannot be empty.")
+            return
 
-        account_type = input("Account type? (1 for Checking, 2 for Savings): ").strip()
-        account_id = f"ACC - {random.randint(1000,9999)}"
+        username = input("Enter username: ").strip()
+        if not username:
+            print("\nUsername cannot be empty.")
+            return
+        if self.username_exists(username):
+            print("\nError! That username is already taken. Try another.")
+            return
 
-        if account_id == "2":
-            acc = SavingsAccount(account_id)
-        else:
-            acc = CheckingAccount(account_id)
+        password = input("Enter password: ").strip()
+        if not password:
+            print("\nPassword cannot be empty.")
+            return
 
-        customer_id = f'CUST-{random.randint(100, 999)}'
+        customer_id = self.generate_customer_id()
+
         new_customer = Customer(
-            username=usnm,
-            password = pswd,
-            id = customer_id,
+            username=username,
+            password=password,
+            customer_id=customer_id,
             name=name,
-            accounts=[acc],
         )
 
         self.customers.append(new_customer)
-        print(f"Account created successfully! Your Account ID is '{acc.account_id}' under Customer ID '{customer_id}'")
+        print(
+            f"\nThank you {name}, for making an account."
+            f"\nYour username is {username}"
+            f"\nYour customer ID is {customer_id}"
+        )
 
-    def view_account_details(self):
-        print("\n--- View Account Details ---")
-        acc_id = input("Enter Account ID: ").strip()
-        customer, acc = self._find_customer_and_account(acc_id)
+    def generate_customer_id(self):
+        while True:
+            customer_id = random.randint(1000, 9999)
 
-        if acc:
-            print(f"\nCustomer Name: {customer.name}")
-            print(f"Customer ID:   {customer.id}")
-            print(f"Account ID:    {acc.account_id}")
-            print(f"Type:          {acc.accountType}")
-            print(f"Balance:       ${acc.balance:.2f}")
+            if not any(
+                customer.customer_id == customer_id
+                for customer in self.customers
+            ):
+                return customer_id
+
+    def access_account(self):
+        print("\n--- Account Login ---")
+
+        username = input("Enter username: ").strip()
+        password = input("Enter password: ").strip()
+
+        customer = self._get_customer(username)
+
+        if not customer or customer.password != password:
+            print("\nError: Invalid username or password.")
+            return
+
+        print(f"\nLogin successful. Welcome back, {customer.name}!")
+        self.customer_menu(customer)
+
+
+
+    def customer_menu(self, customer):
+        while True:
+            print(f"\n--- {customer.name}'s Dashboard ---")
+            print("1. View Accounts & Balances")
+            print("2. Open a New Bank Account (Checking/Savings)")
+            print("3. Deposit Funds")
+            print("4. Withdraw Funds")
+            print("5. Log Out")
+
+            choice = input("Select an option (1-5): ").strip()
+
+            match choice:
+                case "1":
+                    self.view_balances(customer)
+                case "2":
+                    self.open_bank_account(customer)
+                case "3":
+                    self.handle_deposit(customer)
+                case "4":
+                    self.handle_withdrawal(customer)
+                case "5":
+                    print("\nLogging out...")
+                    break
+                case _:
+                    print("\nInvalid option. Please enter a number between 1 and 5.")
+
+    def view_balances(self, customer):
+        if not customer.accounts:
+            print("\nYou currently don't have any open accounts.")
+            return
+
+        print('\n--- Your Accounts ---')
+
+        for index, acc in enumerate(customer.accounts, 1):
+            print(f'{index}. [{acc.account_type}] ID: {acc.account_id} | Balance: ${acc.balance:.2f}')
+
+    def generate_account_id(self):
+        while True:
+            account_id = random.randint(100000, 999999)
+
+            account_exists = any(
+                account.account_id == account_id
+                for customer in self.customers
+                for account in customer.accounts
+            )
+
+            if not account_exists:
+                return account_id
+
+    def open_bank_account(self, customer):
+        print("\n--- Open Bank Account ---")
+        print("1. Checking Account")
+        print("2. Savings Account")
+
+        type_choice = input("Choice (1-2): ").strip()
+        acc_id = self.generate_account_id()
+
+        if type_choice not in ("1", "2"):
+            print("\nInvalid choice. Returning to menu.")
+            return
+
+        if type_choice == "1":
+            account = CheckingAccount(acc_id)
+            account_type = "Checking Account"
         else:
-            print("Account not found.")
+            account = SavingsAccount(acc_id)
+            account_type = "Savings Account"
 
-    def deposit_money(self):
-        print("\n--- Deposit Money ---")
-        acc_id = input("Enter Account ID: ").strip()
-        _, acc = self._find_customer_and_account(acc_id)
+        customer.accounts.append(account)
 
+        print(
+            f"\n{account_type} opened successfully!"
+            f"\nYour account number is: {acc_id}"
+            f"\nCurrent balance: ${account.balance:.2f}"
+        )
+
+
+    def handle_deposit(self, customer):
+        acc = self.select_customer_account(customer)
+        
         if not acc:
-            print("Account not found.")
+            return
+        amount = self.get_amount("Enter deposit amount: $")
+
+        if amount is None:
+            return
+        transaction_id = self.generate_transaction_id()
+        deposit = Deposit(
+            transaction_id,
+            acc.account_id,
+            amount
+        )
+        acc.balance += deposit.amount
+        print(
+            f"\nSuccessfully deposited ${amount:.2f}."
+            f"\nAccount #: {acc.account_id}"
+            f"\nNew Balance: ${acc.balance:.2f}"
+        )
+
+    def handle_withdrawal(self, customer):
+        account = self.select_customer_account(customer)
+
+        if account is None:
             return
 
+        amount = self.get_amount("Enter withdrawal amount: $")
+
+        if amount is None:
+            return
+
+        # savings accoutns do not overdraft
+        if isinstance(account, SavingsAccount):
+            if amount > account.balance:
+                print(
+                    f"\nTransaction Declined:"
+                    f"\nSavings accounts do not allow overdrafts."
+                    f"\nCurrent balance: ${account.balance:.2f}"
+                )
+                return
+
+        transaction_id = self.generate_transaction_id()
+
+        withdrawal = Withdrawal(
+            transaction_id,
+            account.account_id,
+            amount
+        )
+
+        account.balance -= withdrawal.amount
+
+        if account.balance < 0:
+            print(
+                f"\nWithdrawal complete."
+                f"\nAccount #: {account.account_id}"
+                f"\nNote: Account is overdrawn!"
+                f"\nNew Balance: ${account.balance:.2f}"
+            )
+        else:
+            print(
+                f"\nSuccessfully withdrew ${amount:.2f}."
+                f"\nAccount #: {account.account_id}"
+                f"\nNew Balance: ${account.balance:.2f}"
+            )
+
+    def select_customer_account(self, customer):
+        if not customer.accounts:
+            print(
+                "\nYou must open an account "
+                "before making transactions."
+            )
+            return None
+
+        self.view_balances(customer)
+
+        print("\nYou can select an account using:")
+        print("1. The account list number")
+        print("2. The full account number")
+
+        selection = input("\nEnter selection: ").strip()
+
+        # see if its a list position first
+        if selection.isdigit():
+            number = int(selection)
+
+            if 1 <= number <= len(customer.accounts):
+                return customer.accounts[number - 1]
+
+            # if it isn't a list position try the account id
+            account = self.get_account_by_id(customer, number)
+
+            if account is not None:
+                return account
+
+        print("\nInvalid account selection.")
+        return None
+
+    def get_account_by_id(self, customer, account_id):
+        for account in customer.accounts:
+            if account.account_id == account_id:
+                return account
+
+        return None
+
+    @staticmethod
+    def get_amount(prompt):
         try:
-            amount = float(input("Enter deposit amount: $"))
+            amount = float(input(prompt).strip())
+
             if amount <= 0:
-                print("Deposit amount must be positive.")
-                return
+                print("\nAmount must be greater than zero.")
+                return None
 
-            acc.balance += amount
-            txn_id = f"TXN-{random.randint(10000, 99999)}"
-            txn = Deposit(txn_id, acc.account_id, amount)
-            self.transactions.append(txn)
+            return amount
 
-            print(f"Successfully deposited ${amount:.2f}. New Balance: ${acc.balance:.2f}")
         except ValueError:
-            print("Invalid input. Amount must be a number.")
+            print("\nInvalid input. Please enter a numerical value.")
+            return None
 
-    def withdraw_money(self):
-        print("\n--- Withdraw Money ---")
-        acc_id = input("Enter Account ID: ").strip()
-        _, acc = self._find_customer_and_account(acc_id)
+    def generate_transaction_id(self):
+        while True:
+            transaction_id = random.randint(10000, 99999)
 
-        if not acc:
-            print("Account not found.")
-            return
+            transaction_exists = any(
+                transaction_id == transaction.txn_id
+                for customer in self.customers
+                for account in customer.accounts
+                for transaction in account.transactions
+            )
 
-        try:
-            amount = float(input("Enter withdrawal amount: $"))
-            if amount <= 0:
-                print("Withdrawal amount must be positive.")
-                return
+            if not transaction_exists:
+                return transaction_id
 
-            if amount > acc.balance:
-                print(f"Insufficient funds! Current balance: ${acc.balance:.2f}")
-                return
-
-            acc.balance -= amount
-            txn_id = f"TXN-{random.randint(10000, 99999)}"
-            txn = Withdrawal(txn_id, acc.account_id, amount)
-            self.transactions.append(txn)
-
-            print(f"Successfully withdrew ${amount:.2f}. Remaining Balance: ${acc.balance:.2f}")
-        except ValueError:
-            print("Invalid input. Amount must be a number.")
-
-    def view_transaction_history(self):
-        print("\n--- Transaction History ---")
-        acc_id = input("Enter Account ID: ").strip()
-
-        acc_txns = [t for t in self.transactions if t.account_id == acc_id]
-
-        if not acc_txns:
-            print("No transactions found for this account ID.")
-            return
-
-        print(f"\nTransactions for Account '{acc_id}':")
-        for t in acc_txns:
-            sign = "+" if t.txn_type == "Deposit" else "-"
-            print(f"  [{t.txn_id}] {t.txn_type}: {sign}${t.amount:.2f}")
-
-
-class User:
-    def __init__(self, username, password):
+# Customer Class
+class Customer:
+    def __init__(self, username, password, customer_id, name, accounts=None):
         self.username = username
         self.password = password
-
-class Customer(User):
-    def __init__(self, username, password, id, name, accounts=None):
-        super().__init__(username, password)
-        self.id = id
+        self.customer_id = customer_id
         self.name = name
         self.accounts = accounts if accounts is not None else []
 
+# Account Classes
 class Account:
-    def __init__(self, account_id, balance=0):
+    def __init__(self, account_id, balance=0.0):
         self.account_id = account_id
         self.balance = balance
+        self.transactions = []
+
+    def add_transaction(self, transaction):
+        self.transactions.append(transaction)
 
 class CheckingAccount(Account):
-    def __init__(self, account_id, balance=0):
+    # checking accounts allow overdrafts
+
+    def __init__(self, account_id, balance=0.0):
         super().__init__(account_id, balance)
-        self.accountType = "Checking Account"
+        self.account_type = "Checking Account"
 
 class SavingsAccount(Account):
-    def __init__(self, account_id, balance=0):
-        super().__init__(account_id, balance)
-        self.accountType = "Savings Account"
+    # savings accounts do not allow overdrafts
 
+    def __init__(self, account_id, balance=0.0):
+        super().__init__(account_id, balance)
+        self.account_type = "Savings Account"
+
+
+# Transaction Classes
 class Transaction:
     def __init__(self, txn_id, account_id, amount):
         self.txn_id = txn_id
@@ -191,6 +367,8 @@ class Withdrawal(Transaction):
         super().__init__(txn_id, account_id, amount)
         self.txn_type = "Withdrawal"
 
+
+# Runs the program
 if __name__ == "__main__":
     app = Main()
     app.main()
