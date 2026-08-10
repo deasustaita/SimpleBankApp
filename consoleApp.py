@@ -31,15 +31,18 @@ class Main:
                 case _:
                     print("\nInvalid choice. Please type a number between 1 and 3.")
 
+    # username_exists: returns whether a username exists
     def username_exists(self, username):
         return any(customer.username.lower() == username.lower() for customer in self.customers)
 
+    # _get_customer: returns a customer if it exists and nothing if it doesn't
     def _get_customer(self, username):
         for customer in self.customers:
             if customer.username.lower() == username.lower():
                 return customer
         return None
 
+    # create_account: creates a new customer account
     def create_account(self):
         print("\n--- Create Account ---")
 
@@ -70,23 +73,24 @@ class Main:
             name=name,
         )
 
+        # appends customers to a list so that they can be accessed at a later time
         self.customers.append(new_customer)
+
         print(
             f"\nThank you {name}, for making an account."
             f"\nYour username is {username}"
             f"\nYour customer ID is {customer_id}"
         )
 
+    # generate_customer_id: generates a random, not taken customer_id
     def generate_customer_id(self):
         while True:
             customer_id = random.randint(1000, 9999)
 
-            if not any(
-                customer.customer_id == customer_id
-                for customer in self.customers
-            ):
+            if not any(customer.customer_id == customer_id for customer in self.customers):
                 return customer_id
 
+    # access_account: log-in for existing users
     def access_account(self):
         print("\n--- Account Login ---")
 
@@ -102,8 +106,7 @@ class Main:
         print(f"\nLogin successful. Welcome back, {customer.name}!")
         self.customer_menu(customer)
 
-
-
+    # customer_menu: gives users choices on what they can do
     def customer_menu(self, customer):
         while True:
             print(f"\n--- {customer.name}'s Dashboard ---")
@@ -130,6 +133,7 @@ class Main:
                 case _:
                     print("\nInvalid option. Please enter a number between 1 and 5.")
 
+    # view_balances: shows the existing customer accounts
     def view_balances(self, customer):
         if not customer.accounts:
             print("\nYou currently don't have any open accounts.")
@@ -140,19 +144,17 @@ class Main:
         for index, acc in enumerate(customer.accounts, 1):
             print(f'{index}. [{acc.account_type}] ID: {acc.account_id} | Balance: ${acc.balance:.2f}')
 
+    # generate_account_id: generates a random non-existant account_id
     def generate_account_id(self):
         while True:
             account_id = random.randint(100000, 999999)
 
-            account_exists = any(
-                account.account_id == account_id
-                for customer in self.customers
-                for account in customer.accounts
-            )
+            account_exists = any(account.account_id == account_id for customer in self.customers for account in customer.accounts)
 
             if not account_exists:
                 return account_id
 
+    # open_bank_account: allows users to create a new checking or savings account
     def open_bank_account(self, customer):
         print("\n--- Open Bank Account ---")
         print("1. Checking Account")
@@ -180,7 +182,7 @@ class Main:
             f"\nCurrent balance: ${account.balance:.2f}"
         )
 
-
+    # handle_deposit: allows users to make a deposit to an account
     def handle_deposit(self, customer):
         acc = self.select_customer_account(customer)
         
@@ -203,6 +205,7 @@ class Main:
             f"\nNew Balance: ${acc.balance:.2f}"
         )
 
+    # handle_withdrawal: allows users to make a withdrawal from an account
     def handle_withdrawal(self, customer):
         account = self.select_customer_account(customer)
 
@@ -248,6 +251,7 @@ class Main:
                 f"\nNew Balance: ${account.balance:.2f}"
             )
 
+    # select_customer_account: allows the user to choose an account for withdrawal or deposits
     def select_customer_account(self, customer):
         if not customer.accounts:
             print(
