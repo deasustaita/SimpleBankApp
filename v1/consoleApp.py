@@ -71,7 +71,7 @@ class Main:
             password=password,
             customer_id=customer_id,
             name=name,
-        )
+        ) 
 
         # appends customers to a list so that they can be accessed at a later time
         self.customers.append(new_customer)
