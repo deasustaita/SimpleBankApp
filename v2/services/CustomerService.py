@@ -12,4 +12,5 @@ class CustomerService:
     def get_customer_by_id(self, customer_id: int) -> Optional[Customer]:
         return self.repository.find_by_id(customer_id)
 
-    
+    def create_customer(self, customer: Customer) -> Customer:
+        return self.repository.make_customer(customer)

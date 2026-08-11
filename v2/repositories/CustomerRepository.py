@@ -1,4 +1,4 @@
-from models import Customer
+from models.Customer import Customer
 from sample_data import customers
 from typing import List, Optional
 
@@ -17,6 +17,10 @@ class CustomerRepository:
             if customer.id == customer_id:
                 return customer
         return None
+
+    def make_customer(self, customer: Customer) -> Customer:
+        self._data.append(customer.model_dump())
+        return customer
 
 ## wrap in a ResponseEntity rather than return a list
 # 1 example of getall getbyid post put delete rest method call(controller -> service -> repo)
