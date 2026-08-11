@@ -16,7 +16,11 @@ class CustomerRepository:
         customer = self.collection.find_one({"id":customer_id}, {"_id": 0})
         if customer is None:
             return None
-        return Customer(**customer) 
+        return Customer(**customer)
+
+    def make_customer(self, customer: Customer) -> Customer:
+        self.collection.insert_one(customer.model_dump())
+        return customer
 
 ## wrap in a ResponseEntity rather than return a list
 # 1 example of getall getbyid post put delete rest method call(controller -> service -> repo) 
