@@ -1,35 +1,23 @@
-from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import JSONResponse
+from dotenv import dotenv_values
+from pymongo import MongoClient
 
-from repositories.CustomerRepository import CustomerRepository
-from services.CustomerService import CustomerService
+from fastapi import FastAPI
+from routers import CustomerRouter
 
+config = dotenv_values(".env")
 app = FastAPI()
 
-# Instantiate the service and repository directly
-repository = CustomerRepository()
-service = CustomerService(repository=repository)
+@app.on_event("startup")
+def on_start():
+    app.mongodb_client = MongoClient(config["ATLAS_URI"])
+    app.database = app.mongodb_client[config["DB_NAME"]]
 
+app.on_event("shutdown")
+def shutdown():
+    app.mongodb_client.close()
 
-@app.get("/api/v1/customers")
-def get_all_customers():
-    customers = service.get_all_customers()
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content=[c.model_dump() for c in customers],
-    )
+app.include_router(CustomerRouter.router, prefix="/api/v1/customers")
 
-
-@app.get("/api/v1/customers/{customer_id}")
-def get_customer_by_id(customer_id: int):
-    customer = service.get_customer_by_id(customer_id)
-    if not customer:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found"
-        )
-    return JSONResponse(
-        status_code=status.HTTP_200_OK, content=customer.model_dump()
-    )
 
 # post create customer profile
 
