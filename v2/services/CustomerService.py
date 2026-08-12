@@ -1,5 +1,5 @@
 from typing import List, Optional
-from repositories import CustomerRepository
+from repositories.CustomerRepository import CustomerRepository
 from models.Customer import Customer
 
 class CustomerService:

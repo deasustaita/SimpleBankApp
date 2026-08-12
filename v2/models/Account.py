@@ -6,7 +6,7 @@ class Account(BaseModel):
     account_id: int
     user_id: int
     
-    balance: float
+    balance: float = Field(default=0.0)
     account_type: str
 
     transactions: list[Transaction] = Field(default_factory=list)

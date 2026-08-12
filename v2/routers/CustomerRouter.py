@@ -68,5 +68,4 @@ def delete_customer(customer_id: int):
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
         message="Customer deleted.",
-        data=None
     )
