@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from models.Account import Account
 from datetime import datetime
 
@@ -9,6 +9,6 @@ class Customer(BaseModel):
 
     name: str
     email: EmailStr
-    accounts: list[Account]
+    accounts: list[Account] = Field(default_factory=list)
 
-    time_created: str
+    time_created: datetime = Field(default_factory=datetime.now)

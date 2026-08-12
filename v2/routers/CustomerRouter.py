@@ -1,48 +1,61 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
+from typing import List
+
 from repositories.CustomerRepository import CustomerRepository
 from services.CustomerService import CustomerService
 from models.Customer import Customer
+from schemas.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 
 repo = CustomerRepository()
 service = CustomerService(repo)
 
-@router.get("/")
+@router.get("/", response_model=ResponseEntity[List[Customer]])
 def get_all_customers():
     customers = service.get_all_customers()
-    return JSONResponse(
+    return ResponseEntity(
         status_code=status.HTTP_200_OK,
-        content=[Customer(**c).model_dump() for c in customers],
+        message="Customers retrieved successfully.",
+        data=customers,
     )
 
 
-@router.get("/{customer_id}")
+@router.get("/{customer_id}", response_model=ResponseEntity[Customer])
 def get_customer_by_id(customer_id: int):
     customer = service.get_customer_by_id(customer_id)
     if not customer:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
         )
-    return JSONResponse(
-        status_code=status.HTTP_200_OK, content=customer.model_dump()
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer found.",
+        data=customer
     )
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ResponseEntity[Customer])
 def create_customer_profile(customer: Customer):
-    return service.create_customer(customer)
+    created_customer = service.create_customer(customer)
+    return ResponseEntity(
+        status_code=status.HTTP_201_CREATED,
+        message="Customer created successfully.",
+        data=created_customer,
+    )
 
-@router.put("/{customer_id}")
+@router.put("/{customer_id}", response_model=ResponseEntity[Customer])
 def update_customer_info(customer_id: int, customer: Customer):
     updated_customer = service.update_customer(customer_id, customer)
     if not updated_customer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
         )
-    return JSONResponse(
-        status_code=status.HTTP_200_OK, content=updated_customer.model_dump()
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer information updated.",
+        data=updated_customer
     )
 
 @router.delete("/{customer_id}")
@@ -52,4 +65,8 @@ def delete_customer(customer_id: int):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
         )
-    return None
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer deleted.",
+        data=None
+    )

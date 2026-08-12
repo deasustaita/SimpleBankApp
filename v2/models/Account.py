@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 class Account(BaseModel):
@@ -8,4 +8,4 @@ class Account(BaseModel):
     balance: float
     account_type: str
 
-    time_created: datetime
+    time_created: datetime = Field(default_factory=datetime.now)
