@@ -1,17 +1,23 @@
-from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
-import uuid
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic.functional_validators import BeforeValidator
+from typing import Annotated, Optional
+from datetime import datetime, timezone
 
 # use mongoengine for orm data
 
+PyObjectID = Annotated[str, BeforeValidator(str)]
+
 class Customer(BaseModel):
-    id: int
+    id: Optional[PyObjectID] = Field(alias="_id", default=None)
     username: str
+    password: str
 
-    ## For use in later developments but for the moment only the above is needed.
-    # name: str
-    # password: str
-    # created_at: datetime # default current timestamp
-    # email: EmailStr # has to be unique
-    # uuid for id
+    name: str
+    email: EmailStr # must be unique
 
+    time_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )

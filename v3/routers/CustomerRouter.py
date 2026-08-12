@@ -1,45 +1,91 @@
 from fastapi import APIRouter, Request, HTTPException, status
+
+from typing import List
+
 from repositories.CustomerRepository import CustomerRepository
 from services.CustomerService import CustomerService
 from models.Customer import Customer
+from schemas.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=ResponseEntity[List[Customer]])
 def get_all_customers(request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 
-    return service.get_all_customers()
+    customers = service.get_all_customers()
+
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customers retrieved successfully.",
+        data=customers
+    )
 
 
-@router.get("/{customer_id}")
-def get_customer_by_id(customer_id: int, request: Request):
+@router.get("/{customer_id}", response_model=ResponseEntity[Customer])
+def get_customer_by_id(customer_id: str, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 
     customer = service.get_customer_by_id(customer_id)
 
-    if customer is not None:
-        return customer
-    
-    raise HTTPException( 
-        status_code=status.HTTP_404_NOT_FOUND, 
-        detail=f"A customer with ID #{customer_id} does not exist."
+    if not customer:
+        raise HTTPException( 
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"A customer with ID #{customer_id} does not exist."
+        )
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer found.",
+        data=customer
     )
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+
+@router.post("/", response_model=ResponseEntity[Customer])
 def create_customer_profile(customer: Customer, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 
-    return service.create_customer(customer)
+    created_customer = service.create_customer(customer)
 
-@router.put("/")
-def edit_customer_profile(customer: Customer, request: Request):
-    pass
+    return ResponseEntity(
+        status_code=status.HTTP_201_CREATED,
+        message="Customer created successfully.",
+        data=created_customer
+    )
 
-@router.delete("/")
-def delete_customer(customer: Customer, request: Request):
-    pass
+
+@router.put("/{customer_id}", response_model=ResponseEntity[Customer])
+def update_customer_info(customer_id: str, customer: Customer, request: Request):
+    repository = CustomerRepository(request.app.database)
+    service = CustomerService(repository)
+
+    updated_customer = service.update_customer(customer_id, customer)
+
+    if not updated_customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
+        )
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer information updated.",
+        data=updated_customer
+    )
+
+@router.delete("/{customer_id}", response_model=ResponseEntity)
+def delete_customer(customer_id: str, request: Request):
+    repository = CustomerRepository(request.app.database)
+    service = CustomerService(repository)
+
+    deleted = service.delete_customer(customer_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
+        )
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Customer deleted."
+    )
