@@ -1,5 +1,5 @@
 from typing import List, Optional
-from repositories import CustomerRepository
+from repositories.CustomerRepository import CustomerRepository
 from models.Customer import Customer
 
 class CustomerService:
@@ -14,3 +14,9 @@ class CustomerService:
 
     def create_customer(self, customer: Customer) -> Customer:
         return self.repository.make_customer(customer)
+
+    def update_customer(self, customer_id: int, customer: Customer) -> Optional[Customer]:
+        return self.repository.update_customer(customer_id, customer)
+
+    def delete_customer(self, customer_id: int) -> bool:
+        return self.repository.remove_customer(customer_id)
