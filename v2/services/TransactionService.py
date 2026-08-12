@@ -1,2 +1,16 @@
+from models.Transaction import Transaction
+from repositories.TransactionRepository import TransactionRepository
+from typing import Optional
+
 class TransactionService():
-    pass
+    def __init__(self, repository: TransactionRepository):
+        self.repository = repository
+
+    def transfer_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+        return self.repository.transfer_money(account_id, transaction)
+
+    def deposit_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+            return self.repository.deposit_money(account_id, transaction)
+
+    def withdraw_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+            return self.repository.withdraw_money(account_id, transaction)
