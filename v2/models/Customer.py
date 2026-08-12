@@ -1,12 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
+from models.Account import Account
+from datetime import datetime
 
 class Customer(BaseModel):
-    id: int
+    id: int # change to random generation
     username: str
+    password: str
 
-    ## For use in later developments but for the moment only the above is needed.
-    # name: str
-    # password: str
-    # accounts: Accounts[]
+    name: str
+    email: EmailStr
+    accounts: list[Account] = Field(default_factory=list)
 
-
+    time_created: datetime = Field(default_factory=datetime.now)
