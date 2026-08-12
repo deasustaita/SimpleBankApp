@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Request
 
-from typing import List, Optional
+from typing import List
 
 from repositories.AccountRepository import AccountRepository
 from repositories.CustomerRepository import CustomerRepository
+
 from services.AccountService import AccountService
 from models.Account import Account
 from schemas.ResponseEntity import ResponseEntity
