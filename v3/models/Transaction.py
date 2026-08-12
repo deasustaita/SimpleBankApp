@@ -25,7 +25,7 @@ class Deposit(TransactionBase):
 class Withdrawal(TransactionBase):
     txn_type: Literal["WITHDRAWAL"]
 
-class Transfer(TransactionBase):
+class Transfer(TransactionBase): 
     txn_type: Literal["TRANSACTION"]
     dest_account_id: int
 
