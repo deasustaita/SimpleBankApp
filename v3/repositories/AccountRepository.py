@@ -20,7 +20,6 @@ class AccountRepository:
         result = self._accounts.insert_one(account_data)
         
         account.account_id = str(result.inserted_id)
-        
         return account
 
     def find_by_id(self, account_id: str) -> Optional[Account]:

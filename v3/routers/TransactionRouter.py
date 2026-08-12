@@ -13,7 +13,17 @@ router = APIRouter()
 
 @router.get("/", response_model=ResponseEntity(List[Transaction]))
 def get_transactions(request: Request):
-    pass
+    acc_repo = AccountRepository(request.app.database)
+    repository = TransactionRepository(acc_repo, request.app.database)
+    service = TransactionService(repository)
+
+    transactions = service.get_transactions()
+
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Transactions retrieved successfully.",
+        data=transactions
+    )
 
 @router.post("/transfer", response_model=ResponseEntity[Transaction])
 def process_money_transfer(account_id: int, transaction: Transaction, request: Request):

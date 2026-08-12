@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, Discriminator, ConfigDict
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Literal, Annotated, Union, Optional
 from pydantic.functional_validators import BeforeValidator
@@ -12,7 +12,7 @@ class TransactionBase(BaseModel):
     account_id: Optional[str] = None
 
     amount: Decimal
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = ConfigDict(
         populate_by_name=True,
