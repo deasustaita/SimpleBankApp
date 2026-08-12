@@ -33,3 +33,23 @@ def get_customer_by_id(customer_id: int):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_customer_profile(customer: Customer):
     return service.create_customer(customer)
+
+@router.put("/{customer_id}")
+def update_customer_info(customer_id: int, customer: Customer):
+    updated_customer = service.update_customer(customer_id, customer)
+    if not updated_customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
+        )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content=updated_customer.model_dump()
+    )
+
+@router.delete("/{customer_id}")
+def delete_customer(customer_id: int):
+    deleted = service.delete_customer(customer_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found."
+        )
+    return None
