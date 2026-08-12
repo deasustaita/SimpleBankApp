@@ -18,5 +18,5 @@ class AccountService:
     def get_customer_accounts(self, customer_id: str) -> Optional[List[Account]]:
         return self.repository.find_accounts_by_customer(customer_id)
 
-    def delete_customer(self, account_id: str) -> bool:
+    def delete_account(self, account_id: str) -> bool:
         return self.repository.remove_account(account_id)

@@ -76,7 +76,7 @@ def get_customer_accounts(customer_id: str, request: Request):
         data=accounts
     )
 
-@router.delete("accounts/{account_id}", response_model=ResponseEntity)
+@router.delete("/accounts/{account_id}", response_model=ResponseEntity)
 def delete_account(account_id: str, request: Request):
     cust_repo = CustomerRepository(request.app.database)
     repository = AccountRepository(cust_repo, request.app.database)
@@ -87,9 +87,9 @@ def delete_account(account_id: str, request: Request):
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Customer not found."
+            detail="Account not found."
         )
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
-        message="Customer deleted."
+        message="Account deleted."
     )

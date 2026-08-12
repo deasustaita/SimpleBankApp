@@ -46,11 +46,12 @@ class AccountRepository:
         accounts = self._accounts.find({"customer_id": customer_id})
         return [Account(**acc) for acc in accounts]
 
+
     def remove_account(self, account_id: str):
         if not ObjectId.is_valid(account_id):
             return None
 
-        result = self._data.delete_one(
+        result = self._accounts.delete_one(
             {"_id": ObjectId(account_id)}
         )
 
