@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException, status
 
+from typing import List
+
 from repositories.CustomerRepository import CustomerRepository
 from services.CustomerService import CustomerService
 from models.Customer import Customer
@@ -8,7 +10,7 @@ from schemas.ResponseEntity import ResponseEntity
 router = APIRouter()
 
 
-@router.get("/", response_model=ResponseEntity[Customer])
+@router.get("/", response_model=ResponseEntity[List[Customer]])
 def get_all_customers(request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
@@ -23,7 +25,7 @@ def get_all_customers(request: Request):
 
 
 @router.get("/{customer_id}", response_model=ResponseEntity[Customer])
-def get_customer_by_id(customer_id: int, request: Request):
+def get_customer_by_id(customer_id: str, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 
@@ -56,7 +58,7 @@ def create_customer_profile(customer: Customer, request: Request):
 
 
 @router.put("/{customer_id}", response_model=ResponseEntity[Customer])
-def update_customer_info(customer_id: int, customer: Customer, request: Request):
+def update_customer_info(customer_id: str, customer: Customer, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 
@@ -73,7 +75,7 @@ def update_customer_info(customer_id: int, customer: Customer, request: Request)
     )
 
 @router.delete("/{customer_id}", response_model=ResponseEntity[Customer])
-def delete_customer(customer_id: int, request: Request):
+def delete_customer(customer_id: str, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
 

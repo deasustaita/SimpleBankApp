@@ -2,6 +2,7 @@ from typing import List, Optional
 from repositories.CustomerRepository import CustomerRepository
 from models.Customer import Customer
 
+
 class CustomerService:
     def __init__(self, repository: CustomerRepository):
         self.repository = repository
@@ -9,14 +10,14 @@ class CustomerService:
     def get_all_customers(self) -> List[Customer]:
         return self.repository.find_customers()
 
-    def get_customer_by_id(self, customer_id: int) -> Optional[Customer]:
+    def get_customer_by_id(self, customer_id: str) -> Optional[Customer]:
         return self.repository.find_by_id(customer_id)
 
     def create_customer(self, customer: Customer) -> Customer:
         return self.repository.make_customer(customer)
 
-    def update_customer(self, customer_id: int, customer: Customer) -> Optional[Customer]:
+    def update_customer(self, customer_id: str, customer: Customer) -> Optional[Customer]:
         return self.repository.update_customer(customer_id, customer)
 
-    def delete_customer(self, customer_id: int) -> bool:
+    def delete_customer(self, customer_id: str) -> bool:
         return self.repository.remove_customer(customer_id)

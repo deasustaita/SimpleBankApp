@@ -1,10 +1,14 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic.functional_validators import BeforeValidator
+from typing import Annotated, Optional
 from datetime import datetime
 
 # use mongoengine for orm data
 
+PyObjectID = Annotated[str, BeforeValidator(str)]
+
 class Customer(BaseModel):
-    id: int
+    id: Optional[PyObjectID] = Field(alias="_id", default=None)
     username: str
     password: str
 
@@ -13,3 +17,8 @@ class Customer(BaseModel):
     # accounts: list[Account] = Field(default_factory=list)
 
     time_created: datetime = Field(default_factory=datetime.now)
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
