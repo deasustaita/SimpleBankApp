@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from pydantic.functional_validators import BeforeValidator
 from typing import Annotated, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 # use mongoengine for orm data
 
@@ -14,9 +14,8 @@ class Customer(BaseModel):
 
     name: str
     email: EmailStr # must be unique
-    # accounts: list[Account] = Field(default_factory=list)
 
-    time_created: datetime = Field(default_factory=datetime.now)
+    time_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = ConfigDict(
         populate_by_name=True,

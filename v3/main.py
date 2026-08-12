@@ -2,7 +2,7 @@ from dotenv import dotenv_values
 from pymongo import MongoClient
 
 from fastapi import FastAPI
-from routers import CustomerRouter
+from routers import CustomerRouter, AccountRouter
 
 config = dotenv_values(".env")
 app = FastAPI()
@@ -20,7 +20,7 @@ def shutdown():
 
 
 app.include_router(CustomerRouter.router, prefix="/api/v1/customers")
-
+app.include_router(AccountRouter.router, prefix="/api/v1")
 
 # post create customer profile
 

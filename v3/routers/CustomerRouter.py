@@ -74,7 +74,7 @@ def update_customer_info(customer_id: str, customer: Customer, request: Request)
         data=updated_customer
     )
 
-@router.delete("/{customer_id}", response_model=ResponseEntity[Customer])
+@router.delete("/{customer_id}", response_model=ResponseEntity)
 def delete_customer(customer_id: str, request: Request):
     repository = CustomerRepository(request.app.database)
     service = CustomerService(repository)
