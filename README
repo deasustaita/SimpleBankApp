@@ -5,4 +5,8 @@ Project Versions:
     - Simple Flow Console App
   - v2: Base Complete - bugs when running but base for building on is there.
     - Rest API with no database
-  - v3 and beyond: Not started
+  - v3: Base complete - business logic non-existent
+		- Rest API with database
+	- v4: Working on
+		- React implementation
+
