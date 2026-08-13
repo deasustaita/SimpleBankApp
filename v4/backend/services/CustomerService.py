@@ -21,3 +21,11 @@ class CustomerService:
 
     def delete_customer(self, customer_id: str) -> bool:
         return self.repository.remove_customer(customer_id)
+
+    def authenticate_customer(self, username: str, password: str) -> Optional[Customer]:
+        customer = self.repository.find_by_username(username)
+
+        if not customer or customer.password != password:
+            return None
+
+        return customer

@@ -25,6 +25,12 @@ class CustomerRepository:
 
         return None
 
+    def find_by_username(self, username: str) -> Optional[Customer]:
+        customer = self._data.find_one({"username": username})
+        if customer:
+            return Customer(**customer)
+        return None
+
     def make_customer(self, customer: Customer) -> Customer:
         customer_data = customer.model_dump(by_alias=True, exclude_none=True)
 

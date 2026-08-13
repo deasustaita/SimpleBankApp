@@ -6,8 +6,27 @@ from repositories.CustomerRepository import CustomerRepository
 from services.CustomerService import CustomerService
 from models.Customer import Customer
 from models.ResponseEntity import ResponseEntity
+from models.Login import LoginCredentialsRequest
 
 router = APIRouter()
+
+@router.post("/login", response_model=ResponseEntity[Customer])
+def login_customer(credentials: LoginCredentialsRequest, request: Request):
+    repository = CustomerRepository(request.app.database)
+    service = CustomerService(repository)
+
+    customer = service.authenticate_customer(credentials.username, credentials.password)
+
+    if not customer:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid username or password.'
+        )
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Login successful.",
+        data=customer
+    )
 
 
 @router.get("/", response_model=ResponseEntity[List[Customer]])
