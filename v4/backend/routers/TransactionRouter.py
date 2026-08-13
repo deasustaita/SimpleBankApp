@@ -11,7 +11,7 @@ from schemas.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 
-@router.get("/", response_model=ResponseEntity(List[Transaction]))
+@router.get("/", response_model=ResponseEntity[List[Transaction]])
 def get_transactions(request: Request):
     acc_repo = AccountRepository(request.app.database)
     repository = TransactionRepository(acc_repo, request.app.database)
@@ -39,7 +39,7 @@ def process_money_transfer(account_id: int, transaction: Transaction, request: R
         data=new_transfer
     )
 
-@router.post("/deposit", response_model=ResponseEntity([Transaction]))
+@router.post("/deposit", response_model=ResponseEntity[Transaction])
 def process_deposit(account_id: int, transaction: Transaction, request: Request):
     acc_repo = AccountRepository(request.app.database)
     repository = TransactionRepository(acc_repo, request.app.database)
@@ -53,7 +53,7 @@ def process_deposit(account_id: int, transaction: Transaction, request: Request)
         data=new_deposit
     )
 
-@router.post("/withdrawal", response_model=ResponseEntity([Transaction]))
+@router.post("/withdrawal", response_model=ResponseEntity[Transaction])
 def process_withdrawal(account_id:int, transaction: Transaction, request: Request):
     acc_repo = AccountRepository(request.app.database)
     repository = TransactionRepository(acc_repo, request.app.database)

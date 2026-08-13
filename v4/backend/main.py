@@ -2,10 +2,19 @@ from dotenv import dotenv_values
 from pymongo import MongoClient
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers import CustomerRouter, AccountRouter, TransactionRouter
 
 config = dotenv_values(".env")
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 @app.on_event("startup")
@@ -21,7 +30,7 @@ def shutdown():
 
 app.include_router(CustomerRouter.router, prefix="/api/v1/customers")
 app.include_router(AccountRouter.router, prefix="/api/v1")
-app.include_router(TransactionRouter.router, prefix="api/v1/{customer_id}/transactions")
+app.include_router(TransactionRouter.router, prefix="/api/v1/{customer_id}/transactions")
 
 # post create customer profile
 

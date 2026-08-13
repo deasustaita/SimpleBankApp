@@ -8,7 +8,7 @@ from pydantic.functional_validators import BeforeValidator
 PyObjectID = Annotated[str, BeforeValidator(str)]
 
 class AccountBase(BaseModel):
-    account_id: Optional[PyObjectID] = Field(alias="_id", default=None)
+    account_id: Optional[PyObjectID] = Field(validation_alias="_id", default=None)
     customer_id: Optional[str] = None
     
     balance: Decimal = Field(default=0.0)
@@ -22,7 +22,7 @@ class AccountBase(BaseModel):
 
 class CheckingAccount(AccountBase):
     acc_type: Literal["CHECKING"]
-
+ 
 class SavingsAccount(AccountBase):
     acc_type: Literal["SAVINGS"]
 
