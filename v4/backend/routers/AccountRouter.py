@@ -7,7 +7,7 @@ from repositories.CustomerRepository import CustomerRepository
 
 from services.AccountService import AccountService
 from models.Account import Account
-from schemas.ResponseEntity import ResponseEntity
+from models.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 

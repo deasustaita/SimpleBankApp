@@ -5,7 +5,7 @@ from typing import List
 from repositories.CustomerRepository import CustomerRepository
 from services.CustomerService import CustomerService
 from models.Customer import Customer
-from schemas.ResponseEntity import ResponseEntity
+from models.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 
