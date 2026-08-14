@@ -36,7 +36,7 @@ def get_account_by_id(account_id: str, request: Request):
     if not account:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"A customer with ID #{account_id} does not exist."
+            detail=f"An account with ID #{account_id} does not exist."
         )
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
@@ -66,11 +66,6 @@ def get_customer_accounts(customer_id: str, request: Request):
 
     accounts = service.get_customer_accounts(customer_id)
 
-    if not accounts:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"A customer with ID #{customer_id} does not exist."
-        )
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
         message="Accounts retrieved successfully.",

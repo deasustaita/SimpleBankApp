@@ -55,11 +55,11 @@ class AccountRepository:
         return account_adapter.validate_python(self._prepare_document(acc) for acc in accounts)
 
 
-    def find_accounts_by_customer(self, customer_id: str) -> List[Account]:
+    def find_accounts_by_customer(self, customer_id: str) -> Optional[List[Account]]:
         customer = self.customer_repo.find_by_id(customer_id)
 
         if not customer:
-            return None
+            return []
 
         accounts = self._accounts.find({"customer_id": customer_id})
 

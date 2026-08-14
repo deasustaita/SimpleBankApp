@@ -7,3 +7,12 @@ export async function fetchAccountsByCustomer(customerId: string): Promise<Accou
 
     return response.data ?? [];
 }
+
+export async function createAccount(customerId: string, accountType: string, balance?: number): Promise<Account> {
+    const response = await apiRequest<ResponseEntity<Account>>(`/${customerId}/accounts`, {
+        method: 'POST',
+        body: JSON.stringify({acc_type: accountType, balance : balance ?? 0}),
+    });
+
+    return response.data!;
+}

@@ -18,7 +18,7 @@ export async function getAllCustomers(): Promise<Customer | null> {
     return response.data;
 }
 
-export async function  registerCustomer(payload:RegisterCustomerPayload): Promise<Customer> {
+export async function registerCustomer(payload:RegisterCustomerPayload): Promise<Customer> {
     const response = await apiRequest<ResponseEntity<Customer>>('/customers/',{
         method: 'POST',
         body: JSON.stringify(payload),

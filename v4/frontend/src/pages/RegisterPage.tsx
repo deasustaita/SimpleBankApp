@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export function LoginPage() {
-    const { login } = useAuth();
+export function RegisterPage() {
+    const { register } = useAuth();
     const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -18,14 +21,19 @@ export function LoginPage() {
         setLoading(true);
 
         try {
-            await login(username, password);
+            await register(
+                username,
+                password,
+                name,
+                email
+            );
 
             navigate("/dashboard");
         } catch (error) {
             setError(
                 error instanceof Error
                     ? error.message
-                    : "Login failed."
+                    : "Registration failed."
             );
         } finally {
             setLoading(false);
@@ -36,9 +44,31 @@ export function LoginPage() {
         <div>
             <h1>SimpleBank</h1>
 
-            <h2>Login</h2>
+            <h2>Create Account</h2>
 
             <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Name</label>
+
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
+                    />
+                </div>
+
                 <div>
                     <label>Username</label>
 
@@ -66,14 +96,14 @@ export function LoginPage() {
                 )}
 
                 <button type="submit" disabled={loading}>
-                    {loading ? "Logging in..." : "Login"}
+                    {loading ? "Creating account..." : "Register"}
                 </button>
             </form>
 
             <p>
-                Don't have an account?{" "}
-                <Link to="/register">
-                    Register
+                Already have an account?{" "}
+                <Link to="/login">
+                    Login
                 </Link>
             </p>
         </div>
