@@ -13,6 +13,9 @@ class AccountBase(BaseModel):
     
     balance: Decimal = Field(default=0.0)
 
+    nickname: Optional[str] = None
+    is_favorite: bool = Field(default=False)
+
     time_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = ConfigDict(
@@ -22,7 +25,9 @@ class AccountBase(BaseModel):
 
 class CheckingAccount(AccountBase):
     acc_type: Literal["CHECKING"]
- 
+    # checking accounts may overdraw up to this limit
+    overdraft_limit: Decimal = Field(default=Decimal("100"))
+
 class SavingsAccount(AccountBase):
     acc_type: Literal["SAVINGS"]
 
@@ -30,3 +35,7 @@ Account = Annotated[
     Union[CheckingAccount, SavingsAccount],
     Discriminator("acc_type")
 ]
+
+class AccountUpdate(BaseModel):
+    nickname: Optional[str] = None
+    is_favorite: Optional[bool] = None

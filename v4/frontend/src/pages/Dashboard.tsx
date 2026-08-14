@@ -9,8 +9,10 @@ import { AccountCard } from "../components/account/AccountCard";
 import { TransactionTable } from "../components/transaction/TransactionTable";
 import { useAuth } from "../context/AuthContext";
 
+const RECENT_TRANSACTION_LIMIT = 5;
+
 export function DashboardPage() {
-    const { customer, logout } = useAuth();
+    const { customer } = useAuth();
     const navigate = useNavigate();
 
     const [accounts, setAccounts] = useState<Account[]>([]);
@@ -30,7 +32,11 @@ export function DashboardPage() {
                 ]);
 
                 setAccounts(accountData);
-                setTransactions(transactionData);
+                setTransactions(
+                    [...transactionData].sort(
+                        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                    )
+                );
             } catch (error) {
                 console.error('Error loading dashboard:', error);
             } finally {
@@ -40,44 +46,60 @@ export function DashboardPage() {
         loadData();
     }, [customer]);
 
-    function handleLogout() {
-        logout();
-        navigate("/login");
+    function handleFavoriteChange(updated: Account) {
+        setAccounts((prev) =>
+            prev.map((account) => (account.account_id === updated.account_id ? updated : account))
+        );
     }
 
-    if (loading) return <p>Loading your accounts...</p>;
+    if (loading) return <p className="page">Loading your accounts...</p>;
+
+    const favoriteAccounts = accounts.filter((account) => account.is_favorite);
+    const recentTransactions = transactions.slice(0, RECENT_TRANSACTION_LIMIT);
+
     return (
-        <div>
-            <header>
-                <h1>SimpleBank</h1>
-                <button onClick={handleLogout}>Logout</button>
-            </header>
+        <div className="page">
+            <h2>Welcome, {customer!.name}</h2>
+            <p>Username: {customer!.username}</p>
+            <p>Email: {customer!.email}</p>
 
-            <main>
-                <h2>Welcome, {customer!.name}</h2>
-                <p>User ID: {customer!._id} </p>
-                <p>Username: {customer!.username}</p>
-                <p>Email: {customer!.email}</p>
+            <div className="panel">
+                <div className="panel-header">
+                    <h2>Favorite Accounts</h2>
+                    <div className="btn-group">
+                        <button className="btn btn-secondary" onClick={() => navigate('/accounts')}>
+                            See All
+                        </button>
+                        <button className="btn" onClick={() => navigate('/accounts/create')}>
+                            Make Account
+                        </button>
+                    </div>
+                </div>
 
-                <h2>Your Accounts</h2>
-                <button onClick={() => navigate('/accounts/create')}> Create Account</button>
-                {accounts.length === 0 ? (
-                    <p>You don't have any accounts yet.</p>
-                ): (
-                    <div>
-                        {accounts.map((account, index) => (
-                            <AccountCard 
+                {favoriteAccounts.length === 0 ? (
+                    <p>Star an account to pin it here.</p>
+                ) : (
+                    <div className="grid">
+                        {favoriteAccounts.map((account, index) => (
+                            <AccountCard
                                 key={account.account_id || index}
                                 account={account}
+                                onFavoriteChange={handleFavoriteChange}
                             />
                         ))}
                     </div>
                 )}
+            </div>
 
-                <h2>Recent Transactions</h2>
-                <TransactionTable transactions={transactions} />
-            </main>
-
+            <div className="panel">
+                <div className="panel-header">
+                    <h2>Recent Transactions</h2>
+                    <button className="btn btn-secondary" onClick={() => navigate('/transactions')}>
+                        See All
+                    </button>
+                </div>
+                <TransactionTable transactions={recentTransactions} />
+            </div>
         </div>
     )
 }

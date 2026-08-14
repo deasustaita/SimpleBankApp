@@ -20,3 +20,6 @@ class AccountService:
 
     def delete_account(self, account_id: str) -> bool:
         return self.repository.remove_account(account_id)
+
+    def update_account(self, account_id: str, updates: dict) -> Optional[Account]:
+        return self.repository.update_account(account_id, updates)

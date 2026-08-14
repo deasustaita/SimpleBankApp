@@ -47,16 +47,25 @@ export function AccountPage() {
     }).format(Number(account.balance) || 0);
 
     return (
-        <div>
-            <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
+        <div className="page">
+            <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
 
-            <h1>{account.acc_type.toUpperCase()}</h1>
+            <h1>{account.nickname || account.acc_type.toUpperCase()}</h1>
+            <p>{account.acc_type.toUpperCase()} Account</p>
             <p><strong>Balance</strong></p>
             <p>{formattedBalance}</p>
+            {account.acc_type === "CHECKING" && (
+                <p><strong>Overdraft Limit:</strong> ${account.overdraft_limit ?? 0}</p>
+            )}
 
-            <button onClick={() => navigate(`/accounts/${accountId}/transaction`)}>
-                Make Transaction
-            </button>
+            <div className="btn-group">
+                <button className="btn" onClick={() => navigate(`/accounts/${accountId}/transaction`)}>
+                    Make Transaction
+                </button>
+                <button className="btn btn-secondary" onClick={() => navigate(`/accounts/${accountId}/settings`)}>
+                    Account Settings
+                </button>
+            </div>
 
             <h2>Transactions</h2>
             <TransactionTable transactions={transactions} />

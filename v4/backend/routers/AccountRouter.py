@@ -6,7 +6,7 @@ from repositories.AccountRepository import AccountRepository
 from repositories.CustomerRepository import CustomerRepository
 
 from services.AccountService import AccountService
-from models.Account import Account
+from models.Account import Account, AccountUpdate
 from models.ResponseEntity import ResponseEntity
 
 router = APIRouter()
@@ -88,4 +88,23 @@ def delete_account(account_id: str, request: Request):
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
         message="Account deleted."
+    )
+
+@router.patch("/accounts/{account_id}", response_model=ResponseEntity[Account])
+def update_account_settings(account_id: str, update: AccountUpdate, request: Request):
+    cust_repo = CustomerRepository(request.app.database)
+    repository = AccountRepository(cust_repo, request.app.database)
+    service = AccountService(repository)
+
+    updated = service.update_account(account_id, update.model_dump(exclude_unset=True))
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"An account with ID #{account_id} does not exist."
+        )
+    return ResponseEntity(
+        status_code=status.HTTP_200_OK,
+        message="Account updated successfully.",
+        data=updated
     )

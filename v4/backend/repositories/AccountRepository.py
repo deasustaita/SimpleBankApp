@@ -32,8 +32,9 @@ class AccountRepository:
         account.customer_id = customer_id
         account_data = account.model_dump(by_alias=True, exclude_none=True)
 
-        if "balance" in account_data and isinstance(account_data["balance"], Decimal):
-            account_data["balance"] = Decimal128(account_data["balance"])
+        for key in ("balance", "overdraft_limit"):
+            if key in account_data and isinstance(account_data[key], Decimal):
+                account_data[key] = Decimal128(account_data[key])
 
         result = self._accounts.insert_one(account_data)
         
@@ -85,3 +86,18 @@ class AccountRepository:
         )
 
         return result.matched_count > 0
+
+    def update_account(self, account_id: str, updates: dict) -> Optional[Account]:
+        if not ObjectId.is_valid(account_id):
+            return None
+
+        fields = {key: value for key, value in updates.items() if value is not None}
+        if not fields:
+            return self.find_by_id(account_id)
+
+        self._accounts.update_one(
+            {"_id": ObjectId(account_id)},
+            {"$set": fields}
+        )
+
+        return self.find_by_id(account_id)
