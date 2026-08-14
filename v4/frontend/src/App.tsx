@@ -4,6 +4,8 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/Dashboard";
 import { CreateAccountPage } from "./pages/CreateAccountPage";
+import { AccountPage } from "./pages/AccountPage";
+import { CreateTransactionPage } from "./pages/CreateTransactionPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { customer, loading } = useAuth();
@@ -39,6 +41,24 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <CreateAccountPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/accounts/:accountId"
+        element={
+          <ProtectedRoute>
+            <AccountPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/accounts/:accountId/transaction"
+        element={
+          <ProtectedRoute>
+            <CreateTransactionPage />
           </ProtectedRoute>
         }
       />

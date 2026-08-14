@@ -74,3 +74,14 @@ class AccountRepository:
         )
 
         return result.deleted_count > 0
+
+    def update_balance(self, account_id: str, delta: Decimal) -> bool:
+        if not ObjectId.is_valid(account_id):
+            return False
+
+        result = self._accounts.update_one(
+            {"_id": ObjectId(account_id)},
+            {"$inc": {"balance": Decimal128(delta)}}
+        )
+
+        return result.matched_count > 0

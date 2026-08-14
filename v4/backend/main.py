@@ -30,7 +30,7 @@ def shutdown():
 
 app.include_router(CustomerRouter.router, prefix="/api/v1/customers")
 app.include_router(AccountRouter.router, prefix="/api/v1")
-app.include_router(TransactionRouter.router, prefix="/api/v1/{customer_id}/transactions")
+app.include_router(TransactionRouter.router, prefix="/api/v1/transactions")
 
 # post create customer profile
 

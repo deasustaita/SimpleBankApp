@@ -26,8 +26,8 @@ class Withdrawal(TransactionBase):
     txn_type: Literal["WITHDRAWAL"]
 
 class Transfer(TransactionBase): 
-    txn_type: Literal["TRANSACTION"]
-    dest_account_id: int
+    txn_type: Literal["TRANSFER"]
+    dest_account_id: str
 
 Transaction = Annotated[
     Union[Deposit, Transfer, Withdrawal],

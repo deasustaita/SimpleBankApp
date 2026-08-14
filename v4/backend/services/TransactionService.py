@@ -6,14 +6,20 @@ class TransactionService():
     def __init__(self, repository: TransactionRepository):
         self.repository = repository
 
-    def transfer_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+    def transfer_money(self, account_id: str, transaction: Transaction) -> Optional[Transaction]:
         return self.repository.transfer_money(account_id, transaction)
 
-    def deposit_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+    def deposit_money(self, account_id: str, transaction: Transaction) -> Optional[Transaction]:
         return self.repository.deposit_money(account_id, transaction)
 
-    def withdraw_money(self, account_id: int, transaction: Transaction) -> Optional[Transaction]:
+    def withdraw_money(self, account_id: str, transaction: Transaction) -> Optional[Transaction]:
         return self.repository.withdraw_money(account_id, transaction)
 
     def get_transactions(self) -> List[Transaction]:
         return self.repository.find_transactions()
+
+    def get_transactions_by_account(self, account_id: str) -> List[Transaction]:
+        return self.repository.find_transactions_by_account(account_id)
+
+    def get_transactions_by_customer(self, customer_id: str) -> List[Transaction]:
+        return self.repository.find_transactions_by_customer(customer_id)

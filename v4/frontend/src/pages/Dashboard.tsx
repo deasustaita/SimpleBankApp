@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { Account } from "../types/account";
+import type { Transaction } from "../types/transaction";
 import { fetchAccountsByCustomer } from "../api/accountApi";
+import { fetchTransactionsByCustomer } from "../api/transactionApi";
 import { AccountCard } from "../components/account/AccountCard";
+import { TransactionTable } from "../components/transaction/TransactionTable";
 import { useAuth } from "../context/AuthContext";
 
 export function DashboardPage() {
@@ -11,6 +14,7 @@ export function DashboardPage() {
     const navigate = useNavigate();
 
     const [accounts, setAccounts] = useState<Account[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -20,8 +24,13 @@ export function DashboardPage() {
             }
 
             try {
-                const data = await fetchAccountsByCustomer(customer._id)
-                setAccounts(data);
+                const [accountData, transactionData] = await Promise.all([
+                    fetchAccountsByCustomer(customer._id),
+                    fetchTransactionsByCustomer(customer._id),
+                ]);
+
+                setAccounts(accountData);
+                setTransactions(transactionData);
             } catch (error) {
                 console.error('Error loading dashboard:', error);
             } finally {
@@ -64,6 +73,9 @@ export function DashboardPage() {
                         ))}
                     </div>
                 )}
+
+                <h2>Recent Transactions</h2>
+                <TransactionTable transactions={transactions} />
             </main>
 
         </div>
