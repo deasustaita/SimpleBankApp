@@ -33,49 +33,48 @@ export function LoginPage() {
     }
 
     return (
-        <div>
-            <h1>SimpleBank</h1>
+        <main className="auth-shell">
+            <section className="auth-card">
+                <p className="auth-kicker">Simple Bank</p>
+                <h1>Welcome Back</h1>
+                <p className="auth-subtitle">Sign in to manage your money securely.</p>
 
-            <h2>Login</h2>
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            className="auth-input"
+                            type="text"
+                            value={username}
+                            onChange={(event) => setUsername(event.target.value)}
+                            required
+                        />
+                    </div>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username</label>
+                    <div>
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            className="auth-input"
+                            type="password"
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
+                        />
+                    </div>
 
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                        required
-                    />
-                </div>
+                    {error && <p className="error-text">{error}</p>}
 
-                <div>
-                    <label>Password</label>
+                    <button className="btn auth-submit" type="submit" disabled={loading}>
+                        {loading ? "Logging in..." : "Sign In"}
+                    </button>
+                </form>
 
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                        required
-                    />
-                </div>
-
-                {error && (
-                    <p>{error}</p>
-                )}
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Logging in..." : "Login"}
-                </button>
-            </form>
-
-            <p>
-                Don't have an account?{" "}
-                <Link to="/register">
-                    Register
-                </Link>
-            </p>
-        </div>
+                <p className="auth-footnote">
+                    Don't have an account? <Link to="/register">Create one</Link>
+                </p>
+            </section>
+        </main>
     );
 }

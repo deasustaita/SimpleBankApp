@@ -17,3 +17,10 @@ export interface RegisterCustomerPayload {
     name: string;
     email: string;
 }
+
+export interface CustomerUpdatePayload {
+    username?: string;
+    password?: string;
+    name?: string;
+    email?: string;
+}

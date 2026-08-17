@@ -21,6 +21,11 @@ app.add_middleware(
 def on_start():
     app.mongodb_client = MongoClient(config["ATLAS_URI"])
     app.database = app.mongodb_client[config["DB_NAME"]]
+    try:
+        app.database["Customer"].create_index("username", unique=True)
+    except Exception:
+        # Keep startup resilient if existing data violates uniqueness.
+        pass
 
 
 @app.on_event("shutdown")

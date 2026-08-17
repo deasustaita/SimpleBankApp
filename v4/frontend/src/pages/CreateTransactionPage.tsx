@@ -1,14 +1,22 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { depositMoney, withdrawMoney, transferMoney } from "../api/transactionApi";
 
 type TxnType = "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
 
+const TXN_TYPES: { value: TxnType; label: string }[] = [
+    { value: "DEPOSIT", label: "Deposit" },
+    { value: "WITHDRAWAL", label: "Withdrawal" },
+    { value: "TRANSFER", label: "Transfer" },
+];
+
 export function CreateTransactionPage() {
     const { accountId } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const initialType = (searchParams.get("type") as TxnType) || "DEPOSIT";
 
-    const [txnType, setTxnType] = useState<TxnType>("DEPOSIT");
+    const [txnType, setTxnType] = useState<TxnType>(initialType);
     const [amount, setAmount] = useState("");
     const [destAccountId, setDestAccountId] = useState("");
     const [error, setError] = useState("");
@@ -44,43 +52,22 @@ export function CreateTransactionPage() {
     }
 
     return (
-        <div>
-            <h1>Make a Transaction</h1>
+        <div className="page centered-page">
+            <div className="panel form-panel">
+                <h1>Make a Transaction</h1>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>
-                        <input
-                            type="radio"
-                            name="txnType"
-                            value="DEPOSIT"
-                            checked={txnType === "DEPOSIT"}
-                            onChange={() => setTxnType("DEPOSIT")}
-                        />
-                        Deposit
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="txnType"
-                            value="WITHDRAWAL"
-                            checked={txnType === "WITHDRAWAL"}
-                            onChange={() => setTxnType("WITHDRAWAL")}
-                        />
-                        Withdrawal
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="txnType"
-                            value="TRANSFER"
-                            checked={txnType === "TRANSFER"}
-                            onChange={() => setTxnType("TRANSFER")}
-                        />
-                        Transfer
-                    </label>
+                <form onSubmit={handleSubmit}>
+                <div className="txn-type-group">
+                    {TXN_TYPES.map((type) => (
+                        <button
+                            key={type.value}
+                            type="button"
+                            className={`txn-type-btn${txnType === type.value ? ' active' : ''}`}
+                            onClick={() => setTxnType(type.value)}
+                        >
+                            {type.label}
+                        </button>
+                    ))}
                 </div>
 
                 {txnType === "TRANSFER" && (
@@ -109,14 +96,18 @@ export function CreateTransactionPage() {
                     />
                 </div>
 
-                {error && <p>{error}</p>}
+                {error && <p className="error-text">{error}</p>}
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
-                </button>
-            </form>
-
-            <button onClick={() => navigate(`/accounts/${accountId}`)}>Cancel</button>
+                    <div className="action-row">
+                        <button className="btn" type="submit" disabled={loading}>
+                            {loading ? "Submitting..." : "Submit"}
+                        </button>
+                        <button className="btn btn-secondary" type="button" onClick={() => navigate(`/accounts/${accountId}`)}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

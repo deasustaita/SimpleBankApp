@@ -1,4 +1,4 @@
-import type { Account } from "../types/account";
+import type { Account, AccountUpdatePayload } from "../types/account";
 import { apiRequest } from "./client";
 import type { ResponseEntity } from "../types/api";
 
@@ -14,11 +14,32 @@ export async function fetchAccountById(accountId: string): Promise<Account> {
     return response.data!;
 }
 
-export async function createAccount(customerId: string, accountType: string, balance?: number): Promise<Account> {
+export async function createAccount(customerId: string, accountType: string, balance?: number, nickname?: string): Promise<Account> {
+    const normalizedNickname = nickname?.trim();
+
     const response = await apiRequest<ResponseEntity<Account>>(`/${customerId}/accounts`, {
         method: 'POST',
-        body: JSON.stringify({acc_type: accountType, balance : balance ?? 0}),
+        body: JSON.stringify({
+            acc_type: accountType,
+            balance: balance ?? 0,
+            ...(normalizedNickname ? { nickname: normalizedNickname } : {}),
+        }),
     });
 
     return response.data!;
+}
+
+export async function updateAccount(accountId: string, updates: AccountUpdatePayload): Promise<Account> {
+    const response = await apiRequest<ResponseEntity<Account>>(`/accounts/${accountId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates),
+    });
+
+    return response.data!;
+}
+
+export async function deleteAccount(accountId: string): Promise<void> {
+    await apiRequest<ResponseEntity<null>>(`/accounts/${accountId}`, {
+        method: 'DELETE',
+    });
 }

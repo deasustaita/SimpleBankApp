@@ -21,3 +21,10 @@ class Customer(BaseModel):
         populate_by_name=True,
         arbitrary_types_allowed=True
     )
+
+
+class CustomerUpdateRequest(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None

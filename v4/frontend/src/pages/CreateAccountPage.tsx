@@ -13,6 +13,7 @@ export function CreateAccountPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [balance, setBalance] = useState("");
+    const [nickname, setNickname] = useState("");
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -29,7 +30,8 @@ export function CreateAccountPage() {
             await createAccount(
                 customer._id,
                 accountType,
-                balance === "" ? 0 : Number(balance)
+                balance === "" ? 0 : Number(balance),
+                nickname
             );
 
             navigate("/dashboard");
@@ -45,10 +47,11 @@ export function CreateAccountPage() {
     }
 
     return (
-        <div>
-            <h1>Open a New Account</h1>
+        <div className="page centered-page">
+            <div className="panel form-panel">
+                <h1>Open a New Account</h1>
 
-            <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="accountType">
                         Account Type
@@ -75,6 +78,21 @@ export function CreateAccountPage() {
                         </option>
                     </select>
                 </div>
+
+                <div>
+                    <label htmlFor="nickname">
+                        Account Name (Optional)
+                    </label>
+
+                    <input
+                        id="nickname"
+                        type="text"
+                        value={nickname}
+                        onChange={(event) => setNickname(event.target.value)}
+                        placeholder="Defaults to account type"
+                    />
+                </div>
+
                 <div>
                     <label htmlFor="balance">
                         Starting Balance (Optional)
@@ -93,23 +111,18 @@ export function CreateAccountPage() {
                     />
                 </div>
 
-                {error && (
-                    <p>{error}</p>
-                )}
+                    {error && <p className="error-text">{error}</p>}
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                >
-                    {loading
-                        ? "Creating Account..."
-                        : "Create Account"}
-                </button>
-            </form>
-
-            <button onClick={() => navigate("/dashboard")}>
-                Cancel
-            </button>
+                    <div className="action-row">
+                        <button className="btn" type="submit" disabled={loading}>
+                            {loading ? "Creating Account..." : "Create Account"}
+                        </button>
+                        <button className="btn btn-secondary" type="button" onClick={() => navigate("/dashboard")}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
