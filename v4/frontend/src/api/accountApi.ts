@@ -14,10 +14,16 @@ export async function fetchAccountById(accountId: string): Promise<Account> {
     return response.data!;
 }
 
-export async function createAccount(customerId: string, accountType: string, balance?: number): Promise<Account> {
+export async function createAccount(customerId: string, accountType: string, balance?: number, nickname?: string): Promise<Account> {
+    const normalizedNickname = nickname?.trim();
+
     const response = await apiRequest<ResponseEntity<Account>>(`/${customerId}/accounts`, {
         method: 'POST',
-        body: JSON.stringify({acc_type: accountType, balance : balance ?? 0}),
+        body: JSON.stringify({
+            acc_type: accountType,
+            balance: balance ?? 0,
+            ...(normalizedNickname ? { nickname: normalizedNickname } : {}),
+        }),
     });
 
     return response.data!;

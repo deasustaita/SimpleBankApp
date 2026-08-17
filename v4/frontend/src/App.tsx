@@ -11,6 +11,7 @@ import { AccountsPage } from "./pages/AccountsPage";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import { CreateTransactionPage } from "./pages/CreateTransactionPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
+import { CustomerSettingsPage } from "./pages/CustomerSettingsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { customer, loading } = useAuth();
@@ -92,6 +93,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <TransactionsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <CustomerSettingsPage />
           </ProtectedRoute>
         }
       />

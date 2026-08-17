@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, Depends
 
 from typing import List
+from auth.jwt import get_current_customer_id
 
 from repositories.TransactionRepository import TransactionRepository
 from repositories.AccountRepository import AccountRepository
@@ -12,6 +13,29 @@ from models.ResponseEntity import ResponseEntity
 
 router = APIRouter()
 
+
+def _ensure_customer_access(requested_customer_id: str, current_customer_id: str):
+    if requested_customer_id != current_customer_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not allowed to access this customer's transactions."
+        )
+
+
+def _ensure_account_access(request: Request, account_id: str, current_customer_id: str):
+    cust_repo = CustomerRepository(request.app.database)
+    acc_repo = AccountRepository(cust_repo, request.app.database)
+    account = acc_repo.find_by_id(account_id)
+
+    if not account:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found.")
+
+    if account.customer_id != current_customer_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not allowed to access this account."
+        )
+
 def _build_service(request: Request) -> TransactionService:
     cust_repo = CustomerRepository(request.app.database)
     acc_repo = AccountRepository(cust_repo, request.app.database)
@@ -19,10 +43,10 @@ def _build_service(request: Request) -> TransactionService:
     return TransactionService(repository)
 
 @router.get("/", response_model=ResponseEntity[List[Transaction]])
-def get_transactions(request: Request):
+def get_transactions(request: Request, current_customer_id: str = Depends(get_current_customer_id)):
     service = _build_service(request)
 
-    transactions = service.get_transactions()
+    transactions = service.get_transactions_by_customer(current_customer_id)
 
     return ResponseEntity(
         status_code=status.HTTP_200_OK,
@@ -31,7 +55,9 @@ def get_transactions(request: Request):
     )
 
 @router.get("/account/{account_id}", response_model=ResponseEntity[List[Transaction]])
-def get_account_transactions(account_id: str, request: Request):
+def get_account_transactions(account_id: str, request: Request, current_customer_id: str = Depends(get_current_customer_id)):
+    _ensure_account_access(request, account_id, current_customer_id)
+
     service = _build_service(request)
 
     transactions = service.get_transactions_by_account(account_id)
@@ -43,7 +69,9 @@ def get_account_transactions(account_id: str, request: Request):
     )
 
 @router.get("/customer/{customer_id}", response_model=ResponseEntity[List[Transaction]])
-def get_customer_transactions(customer_id: str, request: Request):
+def get_customer_transactions(customer_id: str, request: Request, current_customer_id: str = Depends(get_current_customer_id)):
+    _ensure_customer_access(customer_id, current_customer_id)
+
     service = _build_service(request)
 
     transactions = service.get_transactions_by_customer(customer_id)
@@ -55,7 +83,9 @@ def get_customer_transactions(customer_id: str, request: Request):
     )
 
 @router.post("/transfer", response_model=ResponseEntity[Transaction])
-def process_money_transfer(account_id: str, transaction: Transaction, request: Request):
+def process_money_transfer(account_id: str, transaction: Transaction, request: Request, current_customer_id: str = Depends(get_current_customer_id)):
+    _ensure_account_access(request, account_id, current_customer_id)
+
     service = _build_service(request)
 
     try:
@@ -73,7 +103,9 @@ def process_money_transfer(account_id: str, transaction: Transaction, request: R
     )
 
 @router.post("/deposit", response_model=ResponseEntity[Transaction])
-def process_deposit(account_id: str, transaction: Transaction, request: Request):
+def process_deposit(account_id: str, transaction: Transaction, request: Request, current_customer_id: str = Depends(get_current_customer_id)):
+    _ensure_account_access(request, account_id, current_customer_id)
+
     service = _build_service(request)
 
     new_deposit = service.deposit_money(account_id, transaction)
@@ -88,7 +120,9 @@ def process_deposit(account_id: str, transaction: Transaction, request: Request)
     )
 
 @router.post("/withdrawal", response_model=ResponseEntity[Transaction])
-def process_withdrawal(account_id: str, transaction: Transaction, request: Request):
+def process_withdrawal(account_id: str, transaction: Transaction, request: Request, current_customer_id: str = Depends(get_current_customer_id)):
+    _ensure_account_access(request, account_id, current_customer_id)
+
     service = _build_service(request)
 
     try:

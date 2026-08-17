@@ -30,6 +30,9 @@ class AccountRepository:
             return None
 
         account.customer_id = customer_id
+        if not account.nickname:
+            account.nickname = "Checking" if account.acc_type == "CHECKING" else "Savings"
+
         account_data = account.model_dump(by_alias=True, exclude_none=True)
 
         for key in ("balance", "overdraft_limit"):

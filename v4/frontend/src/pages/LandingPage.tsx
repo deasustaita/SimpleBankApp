@@ -12,7 +12,7 @@ export function LandingPage() {
     return (
         <div>
             <section className="hero">
-                <h1>Welcome to SimpleBank</h1>
+                <h1>Welcome to Simple Bank</h1>
                 <p>
                     Manage checking and savings accounts, track transactions, and keep your
                     finances organized in one simple place.

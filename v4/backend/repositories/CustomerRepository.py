@@ -63,6 +63,25 @@ class CustomerRepository:
 
         return up_customer
 
+    def update_customer_fields(self, customer_id: str, fields: dict) -> Optional[Customer]:
+        if not ObjectId.is_valid(customer_id):
+            return None
+
+        sanitized = {key: value for key, value in fields.items() if value is not None and key != "_id"}
+
+        if not sanitized:
+            return self.find_by_id(customer_id)
+
+        result = self._data.update_one(
+            {"_id": ObjectId(customer_id)},
+            {"$set": sanitized}
+        )
+
+        if result.matched_count == 0:
+            return None
+
+        return self.find_by_id(customer_id)
+
     def remove_customer(self, customer_id: str):
         if not ObjectId.is_valid(customer_id):
             return False

@@ -52,10 +52,11 @@ export function CreateTransactionPage() {
     }
 
     return (
-        <div className="page">
-            <h1>Make a Transaction</h1>
+        <div className="page centered-page">
+            <div className="panel form-panel">
+                <h1>Make a Transaction</h1>
 
-            <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
                 <div className="txn-type-group">
                     {TXN_TYPES.map((type) => (
                         <button
@@ -97,12 +98,16 @@ export function CreateTransactionPage() {
 
                 {error && <p className="error-text">{error}</p>}
 
-                <button className="btn" type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
-                </button>
-            </form>
-
-            <button className="btn btn-secondary" onClick={() => navigate(`/accounts/${accountId}`)}>Cancel</button>
+                    <div className="action-row">
+                        <button className="btn" type="submit" disabled={loading}>
+                            {loading ? "Submitting..." : "Submit"}
+                        </button>
+                        <button className="btn btn-secondary" type="button" onClick={() => navigate(`/accounts/${accountId}`)}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
